@@ -23,33 +23,40 @@
         }
         
         .toolbar {
-            background: #2c3e50;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 15px 20px;
             display: flex;
             align-items: center;
             gap: 15px;
             flex-wrap: wrap;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         
         .toolbar button {
-            background: #34495e;
+            background: rgba(255, 255, 255, 0.2);
             color: white;
-            border: none;
+            border: 1px solid rgba(255, 255, 255, 0.3);
             padding: 8px 16px;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
             font-size: 14px;
-            transition: background 0.2s;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
         }
         
         .toolbar button:hover {
-            background: #4a6741;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
         
         .toolbar button:disabled {
-            background: #5a6c7d;
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
         
         .toolbar input[type="file"] {
@@ -57,17 +64,57 @@
         }
         
         .file-label {
-            background: #27ae60;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
             color: white;
             padding: 8px 16px;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
             font-size: 14px;
-            transition: background 0.2s;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
         }
         
         .file-label:hover {
-            background: #219a52;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(17, 153, 142, 0.4);
+        }
+        
+        .drop-zone {
+            position: relative;
+            border: 2px dashed #bdc3c7;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+        
+        .drop-zone.dragover {
+            border-color: #3498db;
+            background: #e3f2fd;
+            transform: scale(1.02);
+        }
+        
+        .drop-zone-content {
+            pointer-events: none;
+        }
+        
+        .drop-zone-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+            opacity: 0.6;
+        }
+        
+        .file-info {
+            background: #ecf0f1;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-left: 15px;
+            font-size: 12px;
+            color: #7f8c8d;
+            display: none;
         }
         
         .page-info {
@@ -119,6 +166,185 @@
             margin: 0 auto;
         }
         
+        .text-layer {
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+            opacity: 0.2;
+            line-height: 1.0;
+            pointer-events: auto;
+            z-index: 2;
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+        }
+        
+        .text-layer > span {
+            color: transparent;
+            position: absolute;
+            white-space: pre;
+            cursor: text;
+            transform-origin: 0% 0%;
+        }
+        
+        .text-layer ::selection {
+            background: rgba(0, 123, 255, 0.3) !important;
+            color: rgba(0, 123, 255, 0.8) !important;
+        }
+        
+        .text-layer ::-moz-selection {
+            background: rgba(0, 123, 255, 0.3) !important;
+            color: rgba(0, 123, 255, 0.8) !important;
+        }
+
+        /* Debug mode to make text visible */
+        .text-layer.debug-mode > span {
+            color: rgba(255, 0, 0, 0.8) !important;
+            background: rgba(255, 0, 0, 0.2) !important;
+            border: 1px solid rgba(255, 0, 0, 0.8) !important;
+            z-index: 1000 !important;
+            overflow: visible !important;
+        }
+
+        /* PDF.js built-in text layer styles */
+        .textLayer {
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+            opacity: 1;
+            line-height: 1.0;
+            pointer-events: auto;
+        }
+
+        .textLayer > span,
+        .textLayer > div {
+            color: transparent;
+            position: absolute;
+            white-space: pre;
+            cursor: text;
+            user-select: text;
+            transform-origin: 0% 0%;
+        }
+
+        .textLayer ::selection {
+            background: rgba(0, 123, 255, 0.3) !important;
+            color: rgba(0, 123, 255, 0.8) !important;
+        }
+
+        .textLayer ::-moz-selection {
+            background: rgba(0, 123, 255, 0.3) !important;
+            color: rgba(0, 123, 255, 0.8) !important;
+        }
+        
+        .selected-text-info {
+            background: #e8f5e8;
+            border: 1px solid #4caf50;
+            padding: 8px 12px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #2e7d32;
+            display: none;
+        }
+
+        .context-menu {
+            position: fixed;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            padding: 8px;
+            z-index: 1000;
+            display: none;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-width: 280px;
+        }
+
+        .context-menu-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            margin: 2px 0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #333;
+            transition: all 0.2s ease;
+            gap: 10px;
+        }
+
+        .context-menu-item:hover {
+            background: #f5f5f5;
+        }
+
+        .context-menu-item .icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .context-menu-item.primary {
+            color: #1976d2;
+        }
+
+        .context-menu-item.primary:hover {
+            background: #e3f2fd;
+        }
+
+        .context-menu-separator {
+            height: 1px;
+            background: #e0e0e0;
+            margin: 4px 0;
+        }
+
+        .highlight {
+            background-color: rgba(255, 255, 0, 0.3) !important;
+            border-radius: 2px;
+            padding: 1px 2px;
+            margin: -1px -2px;
+            position: relative;
+        }
+
+        .highlight.selected {
+            background-color: rgba(255, 193, 7, 0.5) !important;
+        }
+
+        .highlight-button {
+            background: linear-gradient(135deg, #ffc107 0%, #ff8f00 100%);
+            color: #000;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            font-weight: 500;
+        }
+
+        .highlight-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4);
+        }
+
+        .highlight-button:disabled {
+            background: rgba(255, 193, 7, 0.3);
+            color: rgba(0, 0, 0, 0.5);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
         .loading {
             position: absolute;
             top: 50%;
@@ -153,6 +379,14 @@
             <button id="prev-btn" disabled>Previous</button>
             <button id="next-btn" disabled>Next</button>
             
+            <div id="file-info" class="file-info">
+                <span id="file-name">No file selected</span>
+            </div>
+            
+            <div id="selection-info" class="selected-text-info">
+                <span id="selection-text">Selected: <span id="selection-count">0</span> characters</span>
+            </div>
+            
             <div class="zoom-controls">
                 <button id="zoom-out">−</button>
                 <select id="zoom-select" class="zoom-select">
@@ -168,6 +402,11 @@
                 <button id="zoom-in">+</button>
             </div>
             
+            <button id="download-btn" disabled>💾 Download</button>
+            <button id="select-all-btn" disabled>📄 Select All</button>
+            <button id="ask-ai-btn" disabled>🤖 Ask AI</button>
+            <button id="debug-text-btn" disabled style="background: #e74c3c;">🔍 Debug Text</button>
+            
             <div class="page-info">
                 <span>Page:</span>
                 <input type="number" id="page-input" class="page-input" min="1" value="1">
@@ -176,12 +415,52 @@
         </div>
         
         <div class="viewer-container" id="viewer">
+            <div class="drop-zone" id="drop-zone">
+                <div class="drop-zone-content">
+                    <div class="drop-zone-icon">📄</div>
+                    <h3>Drop PDF file here</h3>
+                    <p>or click "Choose PDF File" above</p>
+                    <small>Supports PDF files up to 50MB</small>
+                </div>
+            </div>
             <div class="loading" id="loading" style="display: none;">
                 Loading PDF...
             </div>
             <div class="error" id="error" style="display: none;">
                 Error loading PDF. Please try a different file.
             </div>
+        </div>
+    </div>
+
+    <div id="context-menu" class="context-menu">
+        <div class="context-menu-item primary" data-action="explain">
+            <div class="icon">💡</div>
+            <span>Explain</span>
+        </div>
+        <div class="context-menu-item primary" data-action="chat">
+            <div class="icon">💬</div>
+            <span>Chat</span>
+        </div>
+        <div class="context-menu-separator"></div>
+        <div class="context-menu-item" data-action="highlight">
+            <div class="icon">🖍️</div>
+            <span>Highlight</span>
+        </div>
+        <div class="context-menu-item" data-action="quiz">
+            <div class="icon">🧠</div>
+            <span>Quiz</span>
+        </div>
+        <div class="context-menu-item" data-action="flashcards">
+            <div class="icon">📚</div>
+            <span>Flashcards</span>
+        </div>
+        <div class="context-menu-item" data-action="notes">
+            <div class="icon">📝</div>
+            <span>Add to notes</span>
+        </div>
+        <div class="context-menu-item" data-action="read-aloud">
+            <div class="icon">🔊</div>
+            <span>Read aloud</span>
         </div>
     </div>
 
@@ -195,6 +474,7 @@
                 this.currentPage = 1;
                 this.scale = 1.0;
                 this.rendering = false;
+                this.currentFile = null;
                 
                 this.initializeElements();
                 this.attachEventListeners();
@@ -207,11 +487,21 @@
                 this.zoomOutBtn = document.getElementById('zoom-out');
                 this.zoomInBtn = document.getElementById('zoom-in');
                 this.zoomSelect = document.getElementById('zoom-select');
+                this.downloadBtn = document.getElementById('download-btn');
+                this.selectAllBtn = document.getElementById('select-all-btn');
+                this.askAiBtn = document.getElementById('ask-ai-btn');
+                this.debugTextBtn = document.getElementById('debug-text-btn');
                 this.pageInput = document.getElementById('page-input');
                 this.totalPages = document.getElementById('total-pages');
                 this.viewer = document.getElementById('viewer');
+                this.dropZone = document.getElementById('drop-zone');
                 this.loading = document.getElementById('loading');
                 this.error = document.getElementById('error');
+                this.fileInfo = document.getElementById('file-info');
+                this.fileName = document.getElementById('file-name');
+                this.selectionInfo = document.getElementById('selection-info');
+                this.selectionCount = document.getElementById('selection-count');
+                this.contextMenu = document.getElementById('context-menu');
             }
             
             attachEventListeners() {
@@ -221,27 +511,114 @@
                 this.zoomOutBtn.addEventListener('click', () => this.zoomOut());
                 this.zoomInBtn.addEventListener('click', () => this.zoomIn());
                 this.zoomSelect.addEventListener('change', (e) => this.handleZoomChange(e));
+                this.downloadBtn.addEventListener('click', () => this.downloadFile());
+                this.selectAllBtn.addEventListener('click', () => this.selectAllText());
+                this.askAiBtn.addEventListener('click', () => this.askAI());
+                this.debugTextBtn.addEventListener('click', () => this.toggleDebugText());
                 this.pageInput.addEventListener('change', (e) => this.goToPage(parseInt(e.target.value)));
+                
+                // Drag and drop events
+                this.dropZone.addEventListener('click', () => this.fileInput.click());
+                this.dropZone.addEventListener('dragover', (e) => this.handleDragOver(e));
+                this.dropZone.addEventListener('dragleave', (e) => this.handleDragLeave(e));
+                this.dropZone.addEventListener('drop', (e) => this.handleDrop(e));
+                
+                // Prevent default drag behaviors on the document
+                document.addEventListener('dragover', (e) => e.preventDefault());
+                document.addEventListener('drop', (e) => e.preventDefault());
+                
+                // Text selection events
+                document.addEventListener('selectionchange', () => this.handleSelectionChange());
+                document.addEventListener('mouseup', (e) => this.handleMouseUp(e));
+                
+                // Context menu events
+                this.contextMenu.addEventListener('click', (e) => this.handleContextMenuClick(e));
+                document.addEventListener('click', (e) => this.handleDocumentClick(e));
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        this.hideContextMenu();
+                    }
+                });
                 
                 // Keyboard shortcuts
                 document.addEventListener('keydown', (e) => this.handleKeydown(e));
             }
             
+            handleDragOver(e) {
+                e.preventDefault();
+                this.dropZone.classList.add('dragover');
+            }
+            
+            handleDragLeave(e) {
+                e.preventDefault();
+                this.dropZone.classList.remove('dragover');
+            }
+            
+            handleDrop(e) {
+                e.preventDefault();
+                this.dropZone.classList.remove('dragover');
+                
+                const files = Array.from(e.dataTransfer.files);
+                if (files.length > 0) {
+                    this.processFile(files[0]);
+                }
+            }
+            
             async handleFileSelect(event) {
                 const file = event.target.files[0];
+                if (file) {
+                    this.processFile(file);
+                }
+            }
+            
+            async processFile(file) {
                 if (!file || file.type !== 'application/pdf') {
                     this.showError('Please select a valid PDF file.');
                     return;
                 }
                 
                 try {
+                    this.currentFile = file;
+                    this.updateFileInfo(file);
                     this.showLoading();
+                    this.hideDropZone();
+                    
                     const arrayBuffer = await file.arrayBuffer();
                     await this.loadPDF(arrayBuffer);
                 } catch (error) {
                     console.error('Error loading PDF:', error);
                     this.showError('Failed to load PDF file.');
                 }
+            }
+            
+            updateFileInfo(file) {
+                this.fileName.textContent = file.name;
+                this.fileInfo.style.display = 'block';
+                this.downloadBtn.disabled = false;
+                this.selectAllBtn.disabled = false;
+                this.askAiBtn.disabled = false;
+                this.debugTextBtn.disabled = false;
+            }
+            
+            hideDropZone() {
+                this.dropZone.style.display = 'none';
+            }
+            
+            showDropZone() {
+                this.dropZone.style.display = 'block';
+            }
+            
+            downloadFile() {
+                if (!this.currentFile) return;
+                
+                const url = URL.createObjectURL(this.currentFile);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = this.currentFile.name;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
             }
             
             async loadPDF(data) {
@@ -275,13 +652,19 @@
                     canvas.className = 'page-canvas';
                     pageContainer.appendChild(canvas);
                     
+                    // Create text layer for text selection
+                    const textLayerDiv = document.createElement('div');
+                    textLayerDiv.className = 'text-layer';
+                    textLayerDiv.id = `text-layer-${pageNum}`;
+                    pageContainer.appendChild(textLayerDiv);
+                    
                     this.viewer.appendChild(pageContainer);
                     
-                    await this.renderPage(pageNum, canvas);
+                    await this.renderPage(pageNum, canvas, textLayerDiv);
                 }
             }
             
-            async renderPage(pageNum, canvas) {
+            async renderPage(pageNum, canvas, textLayerDiv = null) {
                 if (this.rendering) return;
                 
                 try {
@@ -314,6 +697,45 @@
                     };
                     
                     await page.render(renderContext).promise;
+                    
+                    // Render text layer for selection using PDF.js TextLayer
+                    if (textLayerDiv) {
+                        try {
+                            textLayerDiv.innerHTML = '';
+                            //textLayerDiv.style.position = 'absolute';
+                            textLayerDiv.style.left = '0px';
+                            textLayerDiv.style.top = '0px';
+                            textLayerDiv.style.width = viewport.width + 'px';
+                            textLayerDiv.style.height = viewport.height + 'px';
+                            textLayerDiv.style.pointerEvents = 'auto';
+                            textLayerDiv.style.zIndex = '2';
+                            
+                            const textContent = await page.getTextContent();
+                            console.log(`Creating text layer for page ${pageNum} with ${textContent.items.length} text items`);
+                            
+                            // Try to use PDF.js built-in TextLayer first
+                            try {
+                                if (window.pdfjsLib && window.pdfjsLib.TextLayer) {
+                                    const textLayer = new window.pdfjsLib.TextLayer({
+                                        textContentSource: textContent,
+                                        container: textLayerDiv,
+                                        viewport: viewport,
+                                        enhanceTextSelection: true
+                                    });
+                                    textLayer.render();
+                                    console.log('Using PDF.js built-in TextLayer');
+                                } else {
+                                    throw new Error('PDF.js TextLayer not available');
+                                }
+                            } catch (builtInError) {
+                                console.log('Falling back to custom text layer:', builtInError.message);
+                                // Use custom text layer implementation
+                                this.createTextLayer(textContent, textLayerDiv, viewport);
+                            }
+                        } catch (textError) {
+                            console.warn(`Text layer creation failed for page ${pageNum}:`, textError);
+                        }
+                    }
                 } catch (error) {
                     console.error(`Error rendering page ${pageNum}:`, error);
                 } finally {
@@ -326,9 +748,396 @@
                 
                 for (let pageNum = 1; pageNum <= this.pdfDoc.numPages; pageNum++) {
                     const canvas = document.querySelector(`#page-${pageNum} canvas`);
+                    const textLayerDiv = document.querySelector(`#text-layer-${pageNum}`);
                     if (canvas) {
-                        await this.renderPage(pageNum, canvas);
+                        await this.renderPage(pageNum, canvas, textLayerDiv);
                     }
+                }
+            }
+            
+            createTextLayer(textContent, container, viewport) {
+                if (!textContent || !textContent.items) return;
+                
+                // Clear existing text layer
+                container.innerHTML = '';
+                container.style.width = viewport.width + 'px';
+                container.style.height = viewport.height + 'px';
+                container.style.position = 'absolute';
+                container.style.left = '0px';
+                container.style.top = '0px';
+                container.style.pointerEvents = 'auto';
+                container.style.overflow = 'hidden';
+                
+                // Create text spans using improved positioning
+                const textItems = textContent.items;
+                for (let i = 0; i < textItems.length; i++) {
+                    const textItem = textItems[i];
+                    if (!textItem.str || textItem.str.trim() === '') continue;
+                    
+                    try {
+                        const span = document.createElement('span');
+                        span.textContent = textItem.str;
+                        
+                        // Calculate position and size using PDF.js utilities
+                        const tx = pdfjsLib.Util.transform(
+                            pdfjsLib.Util.transform(viewport.transform, textItem.transform),
+                            [1, 0, 0, -1, 0, 0]
+                        );
+                        
+                        // Apply styles
+                        const style = span.style;
+                        //style.position = 'absolute';
+                        style.left = tx[4] + 'px';
+                        style.top = (tx[5] - textItem.height) + 'px';
+                        style.fontSize = Math.abs(tx[0]) + 'px';
+                        style.fontFamily = textItem.fontName || 'sans-serif';
+                        style.color = 'transparent';
+                        style.cursor = 'text';
+                        style.whiteSpace = 'pre';
+                        //style.transformOrigin = '0% 0%';
+                        
+                        container.appendChild(span);
+                        
+                        // if (i < 3) {
+                        //     console.log(`Improved text item ${i}:`, {
+                        //         text: textItem.str,
+                        //         transform: tx,
+                        //         left: tx[4],
+                        //         top: tx[5] - textItem.height,
+                        //         fontSize: Math.abs(tx[0])
+                        //     });
+                        // }
+                    } catch (error) {
+                        console.warn('Error creating text element:', error);
+                    }
+                }
+                
+                console.log(`Improved text layer created with ${container.children.length} text elements`);
+            }
+            
+            selectAllText() {
+                const textLayers = document.querySelectorAll('.text-layer');
+                if (textLayers.length === 0) return;
+                
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                
+                // Create a range that spans all text layers
+                const range = document.createRange();
+                const firstTextLayer = textLayers[0];
+                const lastTextLayer = textLayers[textLayers.length - 1];
+                
+                if (firstTextLayer.firstChild && lastTextLayer.lastChild) {
+                    range.setStartBefore(firstTextLayer.firstChild);
+                    range.setEndAfter(lastTextLayer.lastChild);
+                    selection.addRange(range);
+                }
+            }
+            
+            getSelectedText() {
+                const selection = window.getSelection();
+                return selection.toString().trim();
+            }
+            
+            handleSelectionChange() {
+                const selectedText = this.getSelectedText();
+                
+                if (selectedText.length > 0) {
+                    this.selectionCount.textContent = selectedText.length;
+                    this.selectionInfo.style.display = 'block';
+                } else {
+                    this.selectionInfo.style.display = 'none';
+                    this.hideContextMenu();
+                }
+            }
+
+            handleMouseUp(event) {
+                // Only handle left mouse button
+                if (event.button !== 0) return;
+                
+                // Small delay to ensure selection is complete
+                setTimeout(() => {
+                    const selection = window.getSelection();
+                    const selectedText = this.getSelectedText();
+                    
+                    console.log('Mouse up - Selection:', {
+                        text: selectedText,
+                        rangeCount: selection.rangeCount,
+                        isCollapsed: selection.rangeCount > 0 ? selection.getRangeAt(0).collapsed : true
+                    });
+                    
+                    if (selectedText.length > 0 && selection.rangeCount > 0 && !selection.getRangeAt(0).collapsed) {
+                        this.showContextMenu(event.clientX, event.clientY);
+                    } else {
+                        this.hideContextMenu();
+                    }
+                }, 50);
+            }
+
+            showContextMenu(x, y) {
+                this.contextMenu.style.display = 'block';
+                
+                // Position the menu
+                const rect = this.contextMenu.getBoundingClientRect();
+                const windowWidth = window.innerWidth;
+                const windowHeight = window.innerHeight;
+                
+                // Adjust position to stay within viewport
+                let menuX = x;
+                let menuY = y + 10;
+                
+                if (menuX + rect.width > windowWidth) {
+                    menuX = windowWidth - rect.width - 10;
+                }
+                
+                if (menuY + rect.height > windowHeight) {
+                    menuY = y - rect.height - 10;
+                }
+                
+                this.contextMenu.style.left = menuX + 'px';
+                this.contextMenu.style.top = menuY + 'px';
+            }
+
+            hideContextMenu() {
+                this.contextMenu.style.display = 'none';
+            }
+
+            handleContextMenuClick(event) {
+                const item = event.target.closest('.context-menu-item');
+                if (!item) return;
+                
+                const action = item.dataset.action;
+                const selectedText = this.getSelectedText();
+                
+                this.hideContextMenu();
+                
+                switch (action) {
+                    case 'explain':
+                        this.explainText(selectedText);
+                        break;
+                    case 'chat':
+                        this.chatWithText(selectedText);
+                        break;
+                    case 'highlight':
+                        this.highlightSelectedText();
+                        break;
+                    case 'quiz':
+                        this.createQuiz(selectedText);
+                        break;
+                    case 'flashcards':
+                        this.createFlashcards(selectedText);
+                        break;
+                    case 'notes':
+                        this.addToNotes(selectedText);
+                        break;
+                    case 'read-aloud':
+                        this.readAloud(selectedText);
+                        break;
+                }
+            }
+
+            handleDocumentClick(event) {
+                if (!this.contextMenu.contains(event.target)) {
+                    this.hideContextMenu();
+                }
+            }
+
+            explainText(text) {
+                if (!text) return;
+                
+                console.log('Explaining text:', text);
+                
+                // Create a modal or dialog for explanation
+                const explanation = prompt('Explain this text:\n\n"' + text.substring(0, 100) + (text.length > 100 ? '...' : '') + '"\n\nWhat would you like me to explain about this text?');
+                
+                if (explanation) {
+                    // TODO: Send to AI service for explanation
+                    alert('Explanation request:\n\nText: "' + text.substring(0, 200) + (text.length > 200 ? '...' : '') + '"\n\nQuestion: "' + explanation + '"\n\n(AI integration coming soon!)');
+                }
+            }
+
+            chatWithText(text) {
+                if (!text) return;
+                
+                console.log('Starting chat with text:', text);
+                
+                // Create a modal or dialog for chat
+                const question = prompt('Chat about this text:\n\n"' + text.substring(0, 100) + (text.length > 100 ? '...' : '') + '"\n\nWhat would you like to discuss?');
+                
+                if (question) {
+                    // TODO: Send to AI service for chat
+                    alert('Chat request:\n\nText: "' + text.substring(0, 200) + (text.length > 200 ? '...' : '') + '"\n\nQuestion: "' + question + '"\n\n(AI chat integration coming soon!)');
+                }
+            }
+
+            createQuiz(text) {
+                if (!text) return;
+                
+                console.log('Creating quiz from text:', text);
+                alert('Quiz creation:\n\nText: "' + text.substring(0, 200) + (text.length > 200 ? '...' : '') + '"\n\n(Quiz generation coming soon!)');
+            }
+
+            createFlashcards(text) {
+                if (!text) return;
+                
+                console.log('Creating flashcards from text:', text);
+                alert('Flashcard creation:\n\nText: "' + text.substring(0, 200) + (text.length > 200 ? '...' : '') + '"\n\n(Flashcard generation coming soon!)');
+            }
+
+            addToNotes(text) {
+                if (!text) return;
+                
+                console.log('Adding to notes:', text);
+                
+                // For now, we'll copy to clipboard
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('Text copied to clipboard and ready to add to notes!');
+                }).catch(() => {
+                    alert('Note added:\n\n"' + text.substring(0, 200) + (text.length > 200 ? '...' : '') + '"\n\n(Notes system coming soon!)');
+                });
+            }
+
+            readAloud(text) {
+                if (!text) return;
+                
+                console.log('Reading aloud:', text);
+                
+                // Use Web Speech API for text-to-speech
+                if ('speechSynthesis' in window) {
+                    // Stop any ongoing speech
+                    speechSynthesis.cancel();
+                    
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.rate = 0.8;
+                    utterance.pitch = 1;
+                    utterance.volume = 0.8;
+                    
+                    speechSynthesis.speak(utterance);
+                } else {
+                    alert('Text-to-speech is not supported in your browser.');
+                }
+            }
+
+            highlightSelectedText() {
+                const selection = window.getSelection();
+                if (!selection.rangeCount) return;
+                
+                const range = selection.getRangeAt(0);
+                if (range.collapsed) return;
+                
+                // Check if the selection is within a text layer
+                const textLayer = range.commonAncestorContainer.closest ? 
+                    range.commonAncestorContainer.closest('.text-layer') :
+                    range.commonAncestorContainer.parentElement?.closest('.text-layer');
+                
+                if (!textLayer) return;
+                
+                try {
+                    // Create highlight span
+                    const highlightSpan = document.createElement('span');
+                    highlightSpan.className = 'highlight';
+                    highlightSpan.title = 'Highlighted text';
+                    
+                    // Wrap the selected content
+                    range.surroundContents(highlightSpan);
+                    
+                    // Clear selection
+                    selection.removeAllRanges();
+                    
+                    console.log('Text highlighted successfully');
+                } catch (error) {
+                    // If surroundContents fails (e.g., selection spans multiple elements),
+                    // try a different approach
+                    try {
+                        const contents = range.extractContents();
+                        const highlightSpan = document.createElement('span');
+                        highlightSpan.className = 'highlight';
+                        highlightSpan.title = 'Highlighted text';
+                        highlightSpan.appendChild(contents);
+                        range.insertNode(highlightSpan);
+                        
+                        selection.removeAllRanges();
+                        console.log('Text highlighted successfully (alternative method)');
+                    } catch (altError) {
+                        console.warn('Could not highlight text:', altError);
+                        alert('Unable to highlight this text selection. Please try selecting text within a single paragraph.');
+                    }
+                }
+            }
+
+            clearAllHighlights() {
+                const highlights = document.querySelectorAll('.highlight');
+                highlights.forEach(highlight => {
+                    const parent = highlight.parentNode;
+                    while (highlight.firstChild) {
+                        parent.insertBefore(highlight.firstChild, highlight);
+                    }
+                    parent.removeChild(highlight);
+                });
+                console.log('All highlights cleared');
+            }
+
+            toggleDebugText() {
+                const textLayers = document.querySelectorAll('.text-layer, .textLayer');
+                const isDebugMode = textLayers[0]?.classList.contains('debug-mode');
+                
+                textLayers.forEach(layer => {
+                    if (isDebugMode) {
+                        layer.classList.remove('debug-mode');
+                    } else {
+                        layer.classList.add('debug-mode');
+                    }
+                });
+                
+                // Also add debug styles to all text elements directly
+                const textElements = document.querySelectorAll('.text-layer span, .text-layer div, .textLayer span, .textLayer div');
+                textElements.forEach(element => {
+                    if (isDebugMode) {
+                        element.style.color = 'transparent';
+                        element.style.background = 'none';
+                        element.style.border = 'none';
+                    } else {
+                        element.style.color = 'rgba(255, 0, 0, 0.8)';
+                        element.style.background = 'rgba(255, 0, 0, 0.2)';
+                        element.style.border = '2px solid rgba(255, 0, 0, 0.8)';
+                        element.style.zIndex = '1000';
+                        element.style.overflow = 'visible';
+                        element.style.whiteSpace = 'nowrap';
+                    }
+                });
+                
+                this.debugTextBtn.textContent = isDebugMode ? '🔍 Debug Text' : '❌ Hide Debug';
+                console.log(isDebugMode ? 'Debug mode disabled' : 'Debug mode enabled - text should now be visible');
+            }
+            
+            async askAI() {
+                const selectedText = this.getSelectedText();
+                
+                if (!selectedText) {
+                    alert('Please select some text first before asking AI.');
+                    return;
+                }
+                
+                console.log('Selected text:', selectedText);
+                
+                // Show a prompt for the user's question
+                const question = prompt('What would you like to ask about the selected text?');
+                
+                if (!question) {
+                    return;
+                }
+                
+                try {
+                    // For now, we'll just show the data that will be sent to the API
+                    console.log('Question:', question);
+                    console.log('Selected text:', selectedText);
+                    
+                    // TODO: Call FastAPI backend
+                    alert(`Ready to send to AI:\n\nQuestion: ${question}\n\nSelected text: ${selectedText.substring(0, 200)}${selectedText.length > 200 ? '...' : ''}\n\n(Backend API integration coming next!)`);
+                    
+                } catch (error) {
+                    console.error('Error calling AI:', error);
+                    alert('Error communicating with AI service.');
                 }
             }
             
@@ -394,6 +1203,13 @@
             }
             
             handleKeydown(event) {
+                // Handle Ctrl+A for select all text
+                if (event.ctrlKey && event.key === 'a' && this.pdfDoc) {
+                    event.preventDefault();
+                    this.selectAllText();
+                    return;
+                }
+                
                 if (!this.pdfDoc) return;
                 
                 switch (event.key) {
