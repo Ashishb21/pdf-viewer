@@ -14,12 +14,222 @@
         }
         
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
+            max-width: 100vw;
+            margin: 0;
             background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
             overflow: hidden;
+        }
+        
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .pdf-panel {
+            flex: 0 0 70%;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #e0e0e0;
+            background: white;
+        }
+        
+        .side-panel {
+            flex: 1;
+            background: #ffffff;
+            border-left: 2px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .side-panel-header {
+            background: #343a40;
+            color: white;
+            padding: 15px 20px;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .new-chat-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+        
+        .new-chat-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        .chat-title {
+            font-size: 16px;
+            margin: 0;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .message {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .user-message {
+            background: #e5e5ea;
+            color: #000;
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 80%;
+            align-self: flex-end;
+            font-size: 14px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+        
+        .ai-response {
+            background: #f8f9fa;
+            color: #333;
+            padding: 15px;
+            border-radius: 12px;
+            max-width: 95%;
+            align-self: flex-start;
+            font-size: 14px;
+            line-height: 1.5;
+            border: 1px solid #e9ecef;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .message-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            align-self: flex-start;
+        }
+        
+        .action-btn {
+            background: none;
+            border: 1px solid #dee2e6;
+            color: #6c757d;
+            padding: 4px 8px;
+            border-radius: 16px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .action-btn:hover {
+            background: #f8f9fa;
+            border-color: #adb5bd;
+        }
+        
+        .chat-input-container {
+            padding: 15px;
+            border-top: 1px solid #e9ecef;
+            background: #ffffff;
+        }
+        
+        .chat-input-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+        
+        .chat-input {
+            flex: 1;
+            min-height: 40px;
+            max-height: 120px;
+            padding: 10px 15px;
+            border: 1px solid #ced4da;
+            border-radius: 20px;
+            resize: none;
+            font-family: inherit;
+            font-size: 14px;
+            line-height: 1.4;
+            background: #f8f9fa;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        
+        .chat-input:focus {
+            border-color: #007bff;
+            background: #ffffff;
+        }
+        
+        .send-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: background-color 0.2s;
+            flex-shrink: 0;
+        }
+        
+        .send-btn:hover {
+            background: #0056b3;
+        }
+        
+        .send-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        .empty-chat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .empty-chat-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
         }
         
         .toolbar {
@@ -147,7 +357,7 @@
         }
         
         .viewer-container {
-            height: 80vh;
+            flex: 1;
             overflow: auto;
             background: #525659;
             position: relative;
@@ -318,6 +528,43 @@
         .highlight.selected {
             background-color: rgba(255, 193, 7, 0.5) !important;
         }
+        
+        .search-highlight {
+            background-color: rgba(255, 255, 0, 0.6) !important;
+            border-radius: 2px;
+            padding: 1px 0px;
+            box-shadow: 0 0 2px rgba(255, 255, 0, 0.8);
+        }
+        
+        .search-current {
+            background-color: rgba(255, 165, 0, 0.8) !important;
+            border-radius: 2px;
+            padding: 1px 0px;
+            box-shadow: 0 0 4px rgba(255, 165, 0, 1);
+            animation: pulse 1s ease-in-out;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        
+        .search-container {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        #search-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        #search-input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.15);
+        }
 
         .highlight-button {
             background: linear-gradient(135deg, #ffc107 0%, #ff8f00 100%);
@@ -387,6 +634,13 @@
                 <span id="selection-text">Selected: <span id="selection-count">0</span> characters</span>
             </div>
             
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="Search in PDF..." style="padding: 6px 12px; border: 1px solid rgba(255,255,255,0.3); border-radius: 4px; background: rgba(255,255,255,0.1); color: white; width: 200px; font-size: 14px;">
+                <button id="search-prev" disabled style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 6px 8px; border-radius: 4px; cursor: pointer; margin-left: 5px;">↑</button>
+                <button id="search-next" disabled style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 6px 8px; border-radius: 4px; cursor: pointer;">↓</button>
+                <span id="search-results" style="color: rgba(255,255,255,0.8); font-size: 12px; margin-left: 10px;"></span>
+            </div>
+            
             <div class="zoom-controls">
                 <button id="zoom-out">−</button>
                 <select id="zoom-select" class="zoom-select">
@@ -414,20 +668,53 @@
             </div>
         </div>
         
-        <div class="viewer-container" id="viewer">
-            <div class="drop-zone" id="drop-zone">
-                <div class="drop-zone-content">
-                    <div class="drop-zone-icon">📄</div>
-                    <h3>Drop PDF file here</h3>
-                    <p>or click "Choose PDF File" above</p>
-                    <small>Supports PDF files up to 50MB</small>
+        <div class="main-content">
+            <div class="pdf-panel">
+                <div class="viewer-container" id="viewer">
+                    <div class="drop-zone" id="drop-zone">
+                        <div class="drop-zone-content">
+                            <div class="drop-zone-icon">📄</div>
+                            <h3>Drop PDF file here</h3>
+                            <p>or click "Choose PDF File" above</p>
+                            <small>Supports PDF files up to 50MB</small>
+                        </div>
+                    </div>
+                    <div class="loading" id="loading" style="display: none;">
+                        Loading PDF...
+                    </div>
+                    <div class="error" id="error" style="display: none;">
+                        Error loading PDF. Please try a different file.
+                    </div>
                 </div>
             </div>
-            <div class="loading" id="loading" style="display: none;">
-                Loading PDF...
-            </div>
-            <div class="error" id="error" style="display: none;">
-                Error loading PDF. Please try a different file.
+            
+            <div class="side-panel">
+                <div class="side-panel-header">
+                    <div></div>
+                    <h3 class="chat-title">💬 AI Assistant</h3>
+                    <button class="new-chat-btn" id="new-chat-btn" title="Start new chat">
+                        <span style="transform: rotate(45deg);">📝</span>
+                    </button>
+                </div>
+                
+                <div class="chat-container">
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="empty-chat" id="empty-chat">
+                            <div class="empty-chat-icon">🤖</div>
+                            <h4>Ask me anything about the PDF!</h4>
+                            <p>Select text and ask questions, or type your query below.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-input-container">
+                        <div class="chat-input-wrapper">
+                            <textarea class="chat-input" id="chat-input" placeholder="Ask anything about the document..." rows="1"></textarea>
+                            <button class="send-btn" id="send-btn" disabled>
+                                <span>➤</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -442,10 +729,6 @@
             <span>Chat</span>
         </div>
         <div class="context-menu-separator"></div>
-        <div class="context-menu-item" data-action="highlight">
-            <div class="icon">🖍️</div>
-            <span>Highlight</span>
-        </div>
         <div class="context-menu-item" data-action="quiz">
             <div class="icon">🧠</div>
             <span>Quiz</span>
@@ -453,10 +736,6 @@
         <div class="context-menu-item" data-action="flashcards">
             <div class="icon">📚</div>
             <span>Flashcards</span>
-        </div>
-        <div class="context-menu-item" data-action="notes">
-            <div class="icon">📝</div>
-            <span>Add to notes</span>
         </div>
         <div class="context-menu-item" data-action="read-aloud">
             <div class="icon">🔊</div>
@@ -475,6 +754,9 @@
                 this.scale = 1.0;
                 this.rendering = false;
                 this.currentFile = null;
+                this.lastSelectedText = null;
+                this.searchMatches = [];
+                this.currentSearchIndex = -1;
                 
                 this.initializeElements();
                 this.attachEventListeners();
@@ -502,6 +784,15 @@
                 this.selectionInfo = document.getElementById('selection-info');
                 this.selectionCount = document.getElementById('selection-count');
                 this.contextMenu = document.getElementById('context-menu');
+                this.chatMessages = document.getElementById('chat-messages');
+                this.chatInput = document.getElementById('chat-input');
+                this.sendBtn = document.getElementById('send-btn');
+                this.emptyChat = document.getElementById('empty-chat');
+                this.newChatBtn = document.getElementById('new-chat-btn');
+                this.searchInput = document.getElementById('search-input');
+                this.searchPrev = document.getElementById('search-prev');
+                this.searchNext = document.getElementById('search-next');
+                this.searchResults = document.getElementById('search-results');
             }
             
             attachEventListeners() {
@@ -542,6 +833,18 @@
                 
                 // Keyboard shortcuts
                 document.addEventListener('keydown', (e) => this.handleKeydown(e));
+                
+                // Chat functionality
+                this.chatInput.addEventListener('input', () => this.handleChatInputChange());
+                this.chatInput.addEventListener('keydown', (e) => this.handleChatKeydown(e));
+                this.sendBtn.addEventListener('click', () => this.sendMessage());
+                this.newChatBtn.addEventListener('click', () => this.startNewChat());
+                
+                // Search functionality
+                this.searchInput.addEventListener('input', () => this.handleSearch());
+                this.searchInput.addEventListener('keydown', (e) => this.handleSearchKeydown(e));
+                this.searchPrev.addEventListener('click', () => this.goToPreviousMatch());
+                this.searchNext.addEventListener('click', () => this.goToNextMatch());
             }
             
             handleDragOver(e) {
@@ -786,7 +1089,6 @@
                         
                         // Apply styles
                         const style = span.style;
-                        //style.position = 'absolute';
                         style.left = tx[4] + 'px';
                         style.top = (tx[5] - textItem.height) + 'px';
                         style.fontSize = Math.abs(tx[0]) + 'px';
@@ -794,19 +1096,18 @@
                         style.color = 'transparent';
                         style.cursor = 'text';
                         style.whiteSpace = 'pre';
-                        //style.transformOrigin = '0% 0%';
                         
                         container.appendChild(span);
                         
-                        // if (i < 3) {
-                        //     console.log(`Improved text item ${i}:`, {
-                        //         text: textItem.str,
-                        //         transform: tx,
-                        //         left: tx[4],
-                        //         top: tx[5] - textItem.height,
-                        //         fontSize: Math.abs(tx[0])
-                        //     });
-                        // }
+                        if (i < 3) {
+                            console.log(`Improved text item ${i}:`, {
+                                text: textItem.str,
+                                transform: tx,
+                                left: tx[4],
+                                top: tx[5] - textItem.height,
+                                fontSize: Math.abs(tx[0])
+                            });
+                        }
                     } catch (error) {
                         console.warn('Error creating text element:', error);
                     }
@@ -845,7 +1146,17 @@
                 if (selectedText.length > 0) {
                     this.selectionCount.textContent = selectedText.length;
                     this.selectionInfo.style.display = 'block';
+                    
+                    console.log('Selected text:', selectedText); // Debug log
+                    
+                    // Add selected text to chat input
+                    const truncatedText = selectedText.length > 100 ? 
+                        selectedText.substring(0, 100) + '...' : selectedText;
+                    this.chatInput.value = `Explain: "${truncatedText}"`;
+                    this.handleChatInputChange();
+                    this.chatInput.focus();
                 } else {
+                    this.selectionCount.textContent = '0';
                     this.selectionInfo.style.display = 'none';
                     this.hideContextMenu();
                 }
@@ -854,6 +1165,12 @@
             handleMouseUp(event) {
                 // Only handle left mouse button
                 if (event.button !== 0) return;
+                
+                // Don't process if clicking on side panel
+                const sidePanel = document.querySelector('.side-panel');
+                if (sidePanel && sidePanel.contains(event.target)) {
+                    return;
+                }
                 
                 // Small delay to ensure selection is complete
                 setTimeout(() => {
@@ -868,6 +1185,12 @@
                     
                     if (selectedText.length > 0 && selection.rangeCount > 0 && !selection.getRangeAt(0).collapsed) {
                         this.showContextMenu(event.clientX, event.clientY);
+                        
+                        // Also update chat input with selected text
+                        const truncatedText = selectedText.length > 100 ? 
+                            selectedText.substring(0, 100) + '...' : selectedText;
+                        this.chatInput.value = `Explain: "${truncatedText}"`;
+                        this.handleChatInputChange();
                     } else {
                         this.hideContextMenu();
                     }
@@ -918,17 +1241,11 @@
                     case 'chat':
                         this.chatWithText(selectedText);
                         break;
-                    case 'highlight':
-                        this.highlightSelectedText();
-                        break;
                     case 'quiz':
                         this.createQuiz(selectedText);
                         break;
                     case 'flashcards':
                         this.createFlashcards(selectedText);
-                        break;
-                    case 'notes':
-                        this.addToNotes(selectedText);
                         break;
                     case 'read-aloud':
                         this.readAloud(selectedText);
@@ -939,6 +1256,12 @@
             handleDocumentClick(event) {
                 if (!this.contextMenu.contains(event.target)) {
                     this.hideContextMenu();
+                }
+                
+                // Don't clear selection when clicking on side panel
+                const sidePanel = document.querySelector('.side-panel');
+                if (sidePanel && sidePanel.contains(event.target)) {
+                    return; // Don't clear selection for side panel clicks
                 }
             }
 
@@ -1075,6 +1398,309 @@
                     parent.removeChild(highlight);
                 });
                 console.log('All highlights cleared');
+            }
+
+            // Chat functionality
+            handleChatInputChange() {
+                const hasContent = this.chatInput.value.trim().length > 0;
+                this.sendBtn.disabled = !hasContent;
+                
+                // Auto-resize textarea
+                this.chatInput.style.height = 'auto';
+                this.chatInput.style.height = Math.min(this.chatInput.scrollHeight, 120) + 'px';
+            }
+            
+            handleChatKeydown(event) {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                    event.preventDefault();
+                    if (!this.sendBtn.disabled) {
+                        this.sendMessage();
+                    }
+                }
+            }
+            
+            sendMessage() {
+                const message = this.chatInput.value.trim();
+                if (!message) return;
+                
+                // Hide empty chat state
+                if (this.emptyChat) {
+                    this.emptyChat.style.display = 'none';
+                }
+                
+                // Add user message
+                this.addUserMessage(message);
+                
+                // Clear input
+                this.chatInput.value = '';
+                this.handleChatInputChange();
+                
+                // Simulate AI response (replace with actual AI integration)
+                setTimeout(() => {
+                    this.addAIResponse(this.generateMockResponse(message));
+                }, 1000);
+            }
+            
+            addUserMessage(message) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message';
+                messageDiv.innerHTML = `<div class="user-message">${this.escapeHtml(message)}</div>`;
+                this.chatMessages.appendChild(messageDiv);
+                this.scrollToBottom();
+            }
+            
+            addAIResponse(response) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message';
+                messageDiv.innerHTML = `
+                    <div class="ai-response">${this.escapeHtml(response)}</div>
+                    <div class="message-actions">
+                        <button class="action-btn" onclick="this.parentElement.parentElement.querySelector('.ai-response').style.display='none'">📋 Copy</button>
+                        <button class="action-btn">👍 Good</button>
+                        <button class="action-btn">👎 Bad</button>
+                        <button class="action-btn">🔊 Read</button>
+                    </div>
+                `;
+                this.chatMessages.appendChild(messageDiv);
+                this.scrollToBottom();
+            }
+            
+            generateMockResponse(message) {
+                // This is a mock response - replace with actual AI integration
+                if (message.toLowerCase().includes('explain')) {
+                    return `I understand you'd like me to explain something from the document. This is a mock response - in a real implementation, this would analyze the selected text and provide a detailed explanation based on the PDF content.`;
+                } else if (message.toLowerCase().includes('summarize')) {
+                    return `Here's a mock summary: This would provide a concise summary of the selected content or the entire document, highlighting the key points and main arguments.`;
+                } else {
+                    return `Thank you for your question: "${message}". This is a mock AI response. In a real implementation, I would analyze your query against the PDF content and provide relevant, accurate information.`;
+                }
+            }
+            
+            scrollToBottom() {
+                setTimeout(() => {
+                    this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+                }, 100);
+            }
+            
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+            
+            startNewChat() {
+                // Clear all messages
+                this.chatMessages.innerHTML = '';
+                
+                // Show empty chat state
+                const emptyChat = document.createElement('div');
+                emptyChat.className = 'empty-chat';
+                emptyChat.id = 'empty-chat';
+                emptyChat.innerHTML = `
+                    <div class="empty-chat-icon">🤖</div>
+                    <h4>Ask me anything about the PDF!</h4>
+                    <p>Select text and ask questions, or type your query below.</p>
+                `;
+                this.chatMessages.appendChild(emptyChat);
+                this.emptyChat = emptyChat;
+                
+                // Clear input
+                this.chatInput.value = '';
+                this.handleChatInputChange();
+                this.chatInput.focus();
+                
+                console.log('Started new chat');
+            }
+            
+            // Search functionality
+            handleSearch() {
+                const searchTerm = this.searchInput.value.trim();
+                
+                if (searchTerm.length === 0) {
+                    this.clearSearchHighlights();
+                    this.searchMatches = [];
+                    this.currentSearchIndex = -1;
+                    this.updateSearchResults();
+                    return;
+                }
+                
+                if (searchTerm.length < 2) return; // Wait for at least 2 characters
+                
+                this.performSearch(searchTerm);
+            }
+            
+            handleSearchKeydown(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    if (event.shiftKey) {
+                        this.goToPreviousMatch();
+                    } else {
+                        this.goToNextMatch();
+                    }
+                } else if (event.key === 'Escape') {
+                    this.clearSearch();
+                }
+            }
+            
+            performSearch(searchTerm) {
+                this.clearSearchHighlights();
+                this.searchMatches = [];
+                this.currentSearchIndex = -1;
+                
+                if (!this.pdfDoc || !searchTerm) return;
+                
+                const textLayers = document.querySelectorAll('.text-layer');
+                const searchTermLower = searchTerm.toLowerCase();
+                
+                textLayers.forEach((textLayer, pageIndex) => {
+                    const textSpans = textLayer.querySelectorAll('span');
+                    
+                    textSpans.forEach((span, spanIndex) => {
+                        const text = span.textContent.toLowerCase();
+                        const originalText = span.textContent;
+                        
+                        if (text.includes(searchTermLower)) {
+                            // Find all occurrences in this span
+                            let startIndex = 0;
+                            let index;
+                            
+                            while ((index = text.indexOf(searchTermLower, startIndex)) !== -1) {
+                                // Create highlight wrapper
+                                const beforeText = originalText.substring(0, index);
+                                const matchText = originalText.substring(index, index + searchTerm.length);
+                                const afterText = originalText.substring(index + searchTerm.length);
+                                
+                                // Create new span structure with highlight
+                                const newContent = document.createElement('div');
+                                newContent.style.display = 'inline';
+                                
+                                if (beforeText) {
+                                    newContent.appendChild(document.createTextNode(beforeText));
+                                }
+                                
+                                const highlightSpan = document.createElement('span');
+                                highlightSpan.className = 'search-highlight';
+                                highlightSpan.textContent = matchText;
+                                highlightSpan.dataset.searchMatch = this.searchMatches.length;
+                                newContent.appendChild(highlightSpan);
+                                
+                                if (afterText) {
+                                    newContent.appendChild(document.createTextNode(afterText));
+                                }
+                                
+                                // Store match info
+                                this.searchMatches.push({
+                                    element: highlightSpan,
+                                    pageIndex: pageIndex + 1,
+                                    spanIndex: spanIndex,
+                                    text: matchText
+                                });
+                                
+                                // Replace span content
+                                span.innerHTML = newContent.innerHTML;
+                                
+                                startIndex = index + 1;
+                                break; // Handle one match per span for simplicity
+                            }
+                        }
+                    });
+                });
+                
+                if (this.searchMatches.length > 0) {
+                    this.currentSearchIndex = 0;
+                    this.highlightCurrentMatch();
+                }
+                
+                this.updateSearchResults();
+            }
+            
+            clearSearchHighlights() {
+                const highlights = document.querySelectorAll('.search-highlight, .search-current');
+                highlights.forEach(highlight => {
+                    const parent = highlight.parentNode;
+                    parent.replaceChild(document.createTextNode(highlight.textContent), highlight);
+                    parent.normalize(); // Merge adjacent text nodes
+                });
+            }
+            
+            clearSearch() {
+                this.searchInput.value = '';
+                this.clearSearchHighlights();
+                this.searchMatches = [];
+                this.currentSearchIndex = -1;
+                this.updateSearchResults();
+            }
+            
+            goToNextMatch() {
+                if (this.searchMatches.length === 0) return;
+                
+                this.currentSearchIndex = (this.currentSearchIndex + 1) % this.searchMatches.length;
+                this.highlightCurrentMatch();
+                this.scrollToCurrentMatch();
+            }
+            
+            goToPreviousMatch() {
+                if (this.searchMatches.length === 0) return;
+                
+                this.currentSearchIndex = this.currentSearchIndex <= 0 
+                    ? this.searchMatches.length - 1 
+                    : this.currentSearchIndex - 1;
+                this.highlightCurrentMatch();
+                this.scrollToCurrentMatch();
+            }
+            
+            highlightCurrentMatch() {
+                // Remove current highlighting from all matches
+                const currentHighlights = document.querySelectorAll('.search-current');
+                currentHighlights.forEach(el => {
+                    el.classList.remove('search-current');
+                    el.classList.add('search-highlight');
+                });
+                
+                if (this.currentSearchIndex >= 0 && this.currentSearchIndex < this.searchMatches.length) {
+                    const currentMatch = this.searchMatches[this.currentSearchIndex];
+                    const element = document.querySelector(`[data-search-match="${this.currentSearchIndex}"]`);
+                    
+                    if (element) {
+                        element.classList.remove('search-highlight');
+                        element.classList.add('search-current');
+                    }
+                }
+                
+                this.updateSearchResults();
+            }
+            
+            scrollToCurrentMatch() {
+                if (this.currentSearchIndex >= 0 && this.currentSearchIndex < this.searchMatches.length) {
+                    const currentMatch = this.searchMatches[this.currentSearchIndex];
+                    const element = document.querySelector(`[data-search-match="${this.currentSearchIndex}"]`);
+                    
+                    if (element) {
+                        // Scroll to the page first
+                        this.goToPage(currentMatch.pageIndex);
+                        
+                        // Then scroll to the specific element
+                        setTimeout(() => {
+                            element.scrollIntoView({ 
+                                behavior: 'smooth', 
+                                block: 'center',
+                                inline: 'center'
+                            });
+                        }, 300);
+                    }
+                }
+            }
+            
+            updateSearchResults() {
+                if (this.searchMatches.length === 0) {
+                    this.searchResults.textContent = '';
+                    this.searchPrev.disabled = true;
+                    this.searchNext.disabled = true;
+                } else {
+                    this.searchResults.textContent = `${this.currentSearchIndex + 1} of ${this.searchMatches.length}`;
+                    this.searchPrev.disabled = false;
+                    this.searchNext.disabled = false;
+                }
             }
 
             toggleDebugText() {
