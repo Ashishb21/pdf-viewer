@@ -100,6 +100,17 @@ function updateUserInterface() {
         creditsElement.textContent = currentUser.credits || 95;
     }
     
+    // Update user dropdown with user info
+    if (window.userDropdownManager) {
+        window.userDropdownManager.updateUserName(userName.replace('👋 ', ''));
+    } else {
+        // Fallback: update directly if dropdown manager not ready yet
+        const userNameDropdown = document.getElementById('user-name-dropdown');
+        if (userNameDropdown) {
+            userNameDropdown.textContent = userName.replace('👋 ', '');
+        }
+    }
+    
     updateCreditStatus();
 }
 
