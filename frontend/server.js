@@ -12,6 +12,12 @@ const compression = require('compression');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Enable CORS for backend API
+app.use(cors({
+    origin: ['http://localhost:8000', 'http://127.0.0.1:8000'],
+    credentials: true
+}));
+
 // Create uploads directory if it doesn't exist
 const uploadsDir = path.join(__dirname, 'uploads');
 fs.ensureDirSync(uploadsDir);
@@ -25,7 +31,7 @@ app.use(helmet({
             scriptSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://unpkg.com"],
             styleSrc: ["'self'", "'unsafe-inline'"],
             imgSrc: ["'self'", "data:", "blob:"],
-            connectSrc: ["'self'"],
+            connectSrc: ["'self'", "http://localhost:8000", "http://127.0.0.1:8000"],
             fontSrc: ["'self'"],
             objectSrc: ["'none'"],
             mediaSrc: ["'self'"],
@@ -34,30 +40,89 @@ app.use(helmet({
     },
 }));
 
-// Rate limiting
+// Rate limiting - Disabled in development mode
+const isDevelopment = process.env.NODE_ENV !== 'production';
+
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // Limit each IP to 100 requests per windowMs
+    max: isDevelopment ? 10000 : 100, // Much higher limit in development
     message: 'Too many requests from this IP, please try again later.',
     standardHeaders: true,
     legacyHeaders: false,
+    skip: (req) => {
+        // Skip rate limiting for localhost in development
+        if (isDevelopment) {
+            const ip = req.ip || req.connection.remoteAddress;
+            return ip === '127.0.0.1' || ip === '::1' || ip.includes('127.0.0.1');
+        }
+        return false;
+    }
 });
 
 const uploadLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 10, // Limit each IP to 10 uploads per windowMs
+    max: isDevelopment ? 1000 : 10, // Much higher limit in development
     message: 'Too many file uploads from this IP, please try again later.',
+    skip: (req) => {
+        // Skip rate limiting for localhost in development
+        if (isDevelopment) {
+            const ip = req.ip || req.connection.remoteAddress;
+            return ip === '127.0.0.1' || ip === '::1' || ip.includes('127.0.0.1');
+        }
+        return false;
+    }
 });
 
-app.use(limiter);
+// Only apply rate limiting in production or for non-localhost requests
+if (!isDevelopment) {
+    app.use(limiter);
+    console.log('Rate limiting enabled for production');
+} else {
+    console.log('Rate limiting disabled for development mode');
+}
 app.use(compression());
 app.use(morgan('combined'));
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static files
-app.use(express.static(path.join(__dirname, 'public')));
+// Define custom routes BEFORE static middleware to prevent index.html from being served at root
+// Serve authentication page as the default
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'auth.html'));
+});
+
+// Serve the main PDF viewer app
+app.get('/app', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Also serve index.html directly for backward compatibility
+app.get('/index.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Serve auth page directly
+app.get('/auth.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'auth.html'));
+});
+
+app.get('/auth', (req, res) => {
+    res.sendFile(path.join(__dirname, 'auth.html'));
+});
+
+// Serve OAuth callback page
+app.get('/auth/callback', (req, res) => {
+    res.sendFile(path.join(__dirname, 'auth-callback.html'));
+});
+
+// Serve password reset page
+app.get('/reset-password', (req, res) => {
+    res.sendFile(path.join(__dirname, 'reset-password.html'));
+});
+
+// Serve static files from current directory (AFTER custom routes)
+app.use(express.static(__dirname));
 app.use('/uploads', express.static(uploadsDir));
 
 // File upload configuration
@@ -117,7 +182,8 @@ app.get('/api/status', (req, res) => {
 });
 
 // Upload files
-app.post('/api/upload', uploadLimiter, upload.array('files', 5), async (req, res) => {
+const uploadMiddleware = isDevelopment ? [] : [uploadLimiter];
+app.post('/api/upload', ...uploadMiddleware, upload.array('files', 5), async (req, res) => {
     try {
         if (!req.files || req.files.length === 0) {
             return res.status(400).json({
@@ -374,10 +440,7 @@ const cleanupOldFiles = () => {
 // Run cleanup every hour
 setInterval(cleanupOldFiles, 60 * 60 * 1000);
 
-// Serve the main application
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
+// Routes are now defined earlier in the file before static middleware
 
 // Error handling middleware
 app.use((error, req, res, next) => {
@@ -434,6 +497,11 @@ app.listen(PORT, () => {
     console.log(`🚀 PDF Viewer Server running on port ${PORT}`);
     console.log(`📁 Upload directory: ${uploadsDir}`);
     console.log(`🌐 Access the application at: http://localhost:${PORT}`);
+    console.log(`🔧 Environment: ${isDevelopment ? 'DEVELOPMENT' : 'PRODUCTION'}`);
+    if (isDevelopment) {
+        console.log(`⚡ Rate limiting is DISABLED for development`);
+        console.log(`🔓 Unlimited requests allowed for localhost`);
+    }
 });
 
 module.exports = app;

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Viewer</title>
+    
+    <!-- Quick auth check - redirect if no token -->
+    <script>
+        if (!localStorage.getItem('access_token')) {
+            window.location.replace('/');
+        }
+    </script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="user-header" id="user-header">
+            <div class="user-info">
+                <span id="user-name">Loading...</span>
+                <div class="credit-status" id="credit-status">
+                    <span>💳</span>
+                    <span id="credit-count">0</span>
+                    <span>credits</span>
+                </div>
+            </div>
+            <button class="logout-btn" id="logout-btn">Logout</button>
+        </div>
+        
+        <div class="toolbar">
+            <label for="file-input" class="file-label">Choose PDF File</label>
+            <input type="file" id="file-input" accept=".pdf">
+            
+            <button id="prev-btn" disabled>Previous</button>
+            <button id="next-btn" disabled>Next</button>
+            
+            <div id="file-info" class="file-info">
+                <span id="file-name">No file selected</span>
+            </div>
+            
+            <div id="selection-info" class="selected-text-info">
+                <span id="selection-text">Selected: <span id="selection-count">0</span> characters</span>
+            </div>
+            
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="Search in PDF..." style="padding: 6px 12px; border: 1px solid rgba(255,255,255,0.3); border-radius: 4px; background: rgba(255,255,255,0.1); color: white; width: 200px; font-size: 14px;">
+                <button id="search-prev" disabled style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 6px 8px; border-radius: 4px; cursor: pointer; margin-left: 5px;">↑</button>
+                <button id="search-next" disabled style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 6px 8px; border-radius: 4px; cursor: pointer;">↓</button>
+                <span id="search-results" style="color: rgba(255,255,255,0.8); font-size: 12px; margin-left: 10px;"></span>
+            </div>
+            
+            <div class="zoom-controls">
+                <button id="zoom-out">−</button>
+                <select id="zoom-select" class="zoom-select">
+                    <option value="0.5">50%</option>
+                    <option value="0.75">75%</option>
+                    <option value="1" selected>100%</option>
+                    <option value="1.25">125%</option>
+                    <option value="1.5">150%</option>
+                    <option value="2">200%</option>
+                    <option value="fit-width">Fit Width</option>
+                    <option value="fit-page">Fit Page</option>
+                </select>
+                <button id="zoom-in">+</button>
+            </div>
+            
+            <button id="download-btn" disabled>💾 Download</button>
+            <button id="select-all-btn" disabled>📄 Select All</button>
+            <button id="ask-ai-btn" disabled>🤖 Ask AI</button>
+            <button id="debug-text-btn" disabled style="background: #e74c3c;">🔍 Debug Text</button>
+            
+            <div class="page-info">
+                <span>Page:</span>
+                <input type="number" id="page-input" class="page-input" min="1" value="1">
+                <span>of <span id="total-pages">0</span></span>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="pdf-panel">
+                <div class="viewer-container" id="viewer">
+                    <div class="drop-zone" id="drop-zone">
+                        <div class="drop-zone-content">
+                            <div class="drop-zone-icon">📄</div>
+                            <h3>Drop PDF file here</h3>
+                            <p>or click "Choose PDF File" above</p>
+                            <small>Supports PDF files up to 50MB</small>
+                        </div>
+                    </div>
+                    <div class="loading" id="loading" style="display: none;">
+                        Loading PDF...
+                    </div>
+                    <div class="error" id="error" style="display: none;">
+                        Error loading PDF. Please try a different file.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="side-panel">
+                <div class="side-panel-header">
+                    <div></div>
+                    <h3 class="chat-title">💬 AI Assistant</h3>
+                    <button class="new-chat-btn" id="new-chat-btn" title="Start new chat">
+                        <span style="transform: rotate(45deg);">📝</span>
+                    </button>
+                </div>
+                
+                <div class="chat-container">
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="empty-chat" id="empty-chat">
+                            <div class="empty-chat-icon">🤖</div>
+                            <h4>Ask me anything about the PDF!</h4>
+                            <p>Select text and ask questions, or type your query below.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-input-container">
+                        <div class="chat-input-wrapper">
+                            <textarea class="chat-input" id="chat-input" placeholder="Ask anything about the document..." rows="1"></textarea>
+                            <button class="send-btn" id="send-btn" disabled>
+                                <span>➤</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="context-menu" class="context-menu">
+        <div class="context-menu-item primary" data-action="explain">
+            <div class="icon">💡</div>
+            <span>Explain</span>
+        </div>
+        <div class="context-menu-item primary" data-action="chat">
+            <div class="icon">💬</div>
+            <span>Chat</span>
+        </div>
+        <div class="context-menu-separator"></div>
+        <div class="context-menu-item" data-action="quiz">
+            <div class="icon">🧠</div>
+            <span>Quiz</span>
+        </div>
+        <div class="context-menu-item" data-action="flashcards">
+            <div class="icon">📚</div>
+            <span>Flashcards</span>
+        </div>
+        <div class="context-menu-item" data-action="read-aloud">
+            <div class="icon">🔊</div>
+            <span>Read aloud</span>
+        </div>
+    </div>
+
+    <!-- JavaScript Files -->
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/pdf-viewer.js"></script>
+    <script src="js/chat.js"></script>
+    <script src="js/search.js"></script>
+    <script src="js/debug.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
