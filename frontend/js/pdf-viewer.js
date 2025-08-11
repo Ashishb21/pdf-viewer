@@ -120,6 +120,15 @@ class PDFViewer {
         document.addEventListener('selectionchange', () => this.handleSelectionChange());
         document.addEventListener('mouseup', (e) => this.handleMouseUp(e));
         
+        // Right-click context menu for text selection
+        document.addEventListener('contextmenu', (e) => this.handleRightClick(e));
+        
+        // Drag and drop for selected text
+        document.addEventListener('dragstart', (e) => this.handleDragStart(e));
+        document.addEventListener('dragover', (e) => this.handleTextDragOver(e));
+        document.addEventListener('dragleave', (e) => this.handleTextDragLeave(e));
+        document.addEventListener('drop', (e) => this.handleTextDrop(e));
+        
         // Context menu events
         if (this.contextMenu) {
             this.contextMenu.addEventListener('click', (e) => this.handleContextMenuClick(e));
@@ -539,18 +548,23 @@ class PDFViewer {
      * Handle mouse up event for context menu
      */
     handleMouseUp(event) {
+        // Only handle left mouse button
         if (event.button !== 0) return;
         
+        // Ignore clicks in side panel
         const sidePanel = document.querySelector('.side-panel');
         if (sidePanel && sidePanel.contains(event.target)) {
             return;
         }
         
+        // Delay to allow selection to complete
         setTimeout(() => {
             const selection = window.getSelection();
             const selectedText = this.getSelectedText();
             
             if (selectedText.length > 0 && selection.rangeCount > 0 && !selection.getRangeAt(0).collapsed) {
+                // Store selected text for context menu actions
+                this.lastSelectedText = selectedText;
                 this.showContextMenu(event.clientX, event.clientY);
             } else {
                 this.hideContextMenu();
@@ -559,35 +573,62 @@ class PDFViewer {
     }
     
     /**
+     * Handle right-click for context menu
+     */
+    handleRightClick(event) {
+        const selectedText = this.getSelectedText();
+        
+        // Only show context menu if text is selected and not in side panel
+        const sidePanel = document.querySelector('.side-panel');
+        if (selectedText.length > 0 && (!sidePanel || !sidePanel.contains(event.target))) {
+            event.preventDefault();
+            this.lastSelectedText = selectedText;
+            this.showContextMenu(event.clientX, event.clientY);
+        }
+    }
+    
+    /**
      * Show context menu
      */
     showContextMenu(x, y) {
+        if (!this.contextMenu) return;
+        
         this.contextMenu.style.display = 'block';
         
-        const rect = this.contextMenu.getBoundingClientRect();
-        const windowWidth = window.innerWidth;
-        const windowHeight = window.innerHeight;
-        
-        let menuX = x;
-        let menuY = y + 10;
-        
-        if (menuX + rect.width > windowWidth) {
-            menuX = windowWidth - rect.width - 10;
-        }
-        
-        if (menuY + rect.height > windowHeight) {
-            menuY = y - rect.height - 10;
-        }
-        
-        this.contextMenu.style.left = menuX + 'px';
-        this.contextMenu.style.top = menuY + 'px';
+        // Wait for display to calculate dimensions
+        requestAnimationFrame(() => {
+            const rect = this.contextMenu.getBoundingClientRect();
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            
+            let menuX = x;
+            let menuY = y + 10;
+            
+            // Adjust position to keep menu in viewport
+            if (menuX + rect.width > windowWidth) {
+                menuX = windowWidth - rect.width - 10;
+            }
+            
+            if (menuY + rect.height > windowHeight) {
+                menuY = y - rect.height - 10;
+            }
+            
+            // Ensure minimum distance from edges
+            menuX = Math.max(10, menuX);
+            menuY = Math.max(10, menuY);
+            
+            this.contextMenu.style.left = menuX + 'px';
+            this.contextMenu.style.top = menuY + 'px';
+        });
     }
     
     /**
      * Hide context menu
      */
     hideContextMenu() {
-        this.contextMenu.style.display = 'none';
+        if (this.contextMenu) {
+            this.contextMenu.style.display = 'none';
+        }
     }
     
     /**
@@ -622,10 +663,98 @@ class PDFViewer {
     }
     
     /**
+     * Handle drag start for selected text
+     */
+    handleDragStart(event) {
+        const selectedText = this.getSelectedText();
+        if (selectedText.length > 0) {
+            // Set drag data with selected text
+            event.dataTransfer.setData('text/plain', selectedText);
+            event.dataTransfer.setData('application/pdf-selection', selectedText);
+            event.dataTransfer.effectAllowed = 'copy';
+            
+            // Store for internal use
+            this.lastSelectedText = selectedText;
+            
+            console.log('Starting drag with selected text:', selectedText.substring(0, 50) + '...');
+        }
+    }
+    
+    /**
+     * Handle drag over for text drop zones
+     */
+    handleTextDragOver(event) {
+        const chatInput = document.getElementById('chat-input');
+        const sidePanel = document.querySelector('.side-panel');
+        
+        // Allow drop only in chat area
+        if (sidePanel && sidePanel.contains(event.target)) {
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'copy';
+            
+            // Visual feedback for drop zone
+            if (chatInput) {
+                chatInput.style.background = 'rgba(0, 123, 255, 0.1)';
+                chatInput.style.borderColor = 'rgba(0, 123, 255, 0.5)';
+            }
+        }
+    }
+    
+    /**
+     * Handle drag leave to remove visual feedback
+     */
+    handleTextDragLeave(event) {
+        // Only remove feedback when leaving the side panel entirely
+        const sidePanel = document.querySelector(".side-panel");
+        if (sidePanel && !sidePanel.contains(event.relatedTarget)) {
+            const chatInput = document.getElementById("chat-input");
+            if (chatInput) {
+                chatInput.style.background = "";
+                chatInput.style.borderColor = "";
+            }
+        }
+    }
+    
+    /**
+     * Handle text drop in chat area
+     */
+    handleTextDrop(event) {
+        const sidePanel = document.querySelector('.side-panel');
+        const chatInput = document.getElementById('chat-input');
+        
+        // Reset visual feedback
+        if (chatInput) {
+            chatInput.style.background = '';
+            chatInput.style.borderColor = '';
+        }
+        
+        if (sidePanel && sidePanel.contains(event.target)) {
+            event.preventDefault();
+            
+            const droppedText = event.dataTransfer.getData('text/plain') || 
+                              event.dataTransfer.getData('application/pdf-selection');
+            
+            if (droppedText && window.chatManager) {
+                // Add "Explain:" prefix and populate chat input
+                const truncatedText = droppedText.length > 200 ? 
+                    droppedText.substring(0, 200) + '...' : droppedText;
+                
+                if (chatInput) {
+                    chatInput.value = `Explain: "${truncatedText}"`;
+                    window.chatManager.handleChatInputChange();
+                    chatInput.focus();
+                }
+                
+                console.log('Dropped text into chat:', droppedText.substring(0, 50) + '...');
+            }
+        }
+    }
+    
+    /**
      * Handle document clicks
      */
     handleDocumentClick(event) {
-        if (!this.contextMenu.contains(event.target)) {
+        if (this.contextMenu && !this.contextMenu.contains(event.target)) {
             this.hideContextMenu();
         }
         
@@ -735,21 +864,38 @@ class PDFViewer {
     }
     
     /**
-     * Placeholder methods for context menu actions
+     * Context menu actions integrated with chat
      */
     explainText(text) {
-        if (!text) return;
-        const explanation = prompt('Explain this text:\n\n"' + text.substring(0, 100) + (text.length > 100 ? '...' : '') + '"\n\nWhat would you like me to explain about this text?');
-        if (explanation) {
-            alert('Explanation request - AI integration coming soon!');
+        if (!text || !window.chatManager) return;
+        
+        // Store selected text for context
+        this.lastSelectedText = text;
+        
+        // Add "Explain:" prefix and send to chat
+        const truncatedText = text.length > 200 ? text.substring(0, 200) + '...' : text;
+        window.chatManager.updateWithSelectedText(truncatedText);
+        
+        // Focus the chat input so user can modify or send immediately
+        const chatInput = document.getElementById('chat-input');
+        if (chatInput) {
+            chatInput.focus();
         }
     }
     
     chatWithText(text) {
-        if (!text) return;
-        const question = prompt('Chat about this text:\n\n"' + text.substring(0, 100) + (text.length > 100 ? '...' : '') + '"\n\nWhat would you like to discuss?');
-        if (question) {
-            alert('Chat request - AI integration coming soon!');
+        if (!text || !window.chatManager) return;
+        
+        // Store selected text for context
+        this.lastSelectedText = text;
+        
+        // Set the selected text in chat input for general discussion
+        const truncatedText = text.length > 200 ? text.substring(0, 200) + '...' : text;
+        const chatInput = document.getElementById('chat-input');
+        if (chatInput) {
+            chatInput.value = `Tell me about: "${truncatedText}"`;
+            window.chatManager.handleChatInputChange();
+            chatInput.focus();
         }
     }
     

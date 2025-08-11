@@ -93,6 +93,10 @@ async def root():
                     <span class="method post">POST</span> <code>/api/pdf/summarize</code><br>
                     Summarize PDF content (4 credits)
                 </div>
+                <div class="endpoint">
+                    <span class="method post">POST</span> <code>/api/pdf/chat</code><br>
+                    General chat with Anthropic AI (2 credits) - Currently with dummy responses
+                </div>
                 
                 <h2>📚 Documentation</h2>
                 <p>

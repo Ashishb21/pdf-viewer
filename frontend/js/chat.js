@@ -109,27 +109,27 @@ class ChatManager {
             let result;
             
             // Determine the type of request based on message content
-            if (message.toLowerCase().includes('explain') || message.toLowerCase().includes('analyze')) {
-                // Use analyze endpoint
-                const selectedText = window.pdfViewer ? window.pdfViewer.lastSelectedText || message : message;
+            if (message.toLowerCase().includes('explain') && window.pdfViewer && window.pdfViewer.lastSelectedText) {
+                // Use analyze endpoint for explaining selected PDF text
+                const selectedText = window.pdfViewer.lastSelectedText;
                 result = await callAPI('/pdf/analyze', 'POST', {
                     text: selectedText,
                     question: message
                 }, 2); // 2 credits for analysis
-            } else if (message.toLowerCase().includes('summarize') || message.toLowerCase().includes('summary')) {
-                // Use summarize endpoint
-                const selectedText = window.pdfViewer ? window.pdfViewer.lastSelectedText || message : message;
+            } else if (message.toLowerCase().includes('summarize') && window.pdfViewer && window.pdfViewer.lastSelectedText) {
+                // Use summarize endpoint for PDF content
+                const selectedText = window.pdfViewer.lastSelectedText;
                 result = await callAPI('/pdf/summarize', 'POST', {
                     text: selectedText,
                     summary_type: 'brief'
                 }, 4); // 4 credits for summarization
             } else {
-                // Use general Q&A endpoint
+                // Use general chat endpoint for all other queries
                 const context = window.pdfViewer ? window.pdfViewer.lastSelectedText || '' : '';
-                result = await callAPI('/pdf/ask', 'POST', {
-                    question: message,
+                result = await callAPI('/pdf/chat', 'POST', {
+                    message: message,
                     context: context
-                }, 3); // 3 credits for Q&A
+                }, 2); // 2 credits for general chat
             }
             
             if (result) {
@@ -140,6 +140,8 @@ class ChatManager {
                     this.addAIResponse(result.summary);
                 } else if (result.answer) {
                     this.addAIResponse(result.answer);
+                } else if (result.response) {
+                    this.addAIResponse(result.response);
                 } else {
                     this.addAIResponse("I received your message but couldn't process it properly. Please try again.");
                 }
@@ -267,16 +269,8 @@ class ChatManager {
         const messageDiv = button.closest('.message');
         const responseText = messageDiv.querySelector('.ai-response').textContent;
         
-        button.textContent = '🔊 Playing';
-        button.disabled = true;
-        
-        readAloud(responseText);
-        
-        // Reset button after a delay
-        setTimeout(() => {
-            button.textContent = '🔊 Read';
-            button.disabled = false;
-        }, 2000);
+        // Pass the button to readAloud so it can manage the button state
+        readAloud(responseText, button);
     }
     
     /**
@@ -313,8 +307,8 @@ class ChatManager {
         emptyChat.id = 'empty-chat';
         emptyChat.innerHTML = `
             <div class="empty-chat-icon">🤖</div>
-            <h4>Ask me anything about the PDF!</h4>
-            <p>Select text and ask questions, or type your query below.</p>
+            <h4>Chat with Claude AI!</h4>
+            <p>Ask me anything - from PDF analysis to general questions. Select text for document-specific queries.</p>
         `;
         this.chatMessages.appendChild(emptyChat);
         this.emptyChat = emptyChat;

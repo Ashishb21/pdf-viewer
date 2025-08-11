@@ -25,7 +25,7 @@ body {
 }
 
 .pdf-panel {
-    flex: 0 0 50%;
+    flex: 0 0 60%;
     display: flex;
     flex-direction: column;
     border-right: 2px solid #e0e0e0;
@@ -33,7 +33,7 @@ body {
 }
 
 .side-panel {
-    flex: 0 0 50%;
+    flex: 0 0 40%;
     background: #ffffff;
     border-left: 2px solid #e0e0e0;
     display: flex;
@@ -971,4 +971,24 @@ body.dark-mode {
 
 .dark-mode .dropdown-collapse:hover {
     color: #e0e0e0;
+}
+
+/* Enhanced text layer drag functionality */
+.textLayer > span,
+.textLayer > div,
+.text-layer > span,
+.text-layer > div {
+    -webkit-user-drag: element;
+    user-drag: element;
+}
+
+/* Chat input drop zone styling */
+.chat-input-container {
+    transition: all 0.3s ease;
+}
+
+.chat-input-container.drag-over {
+    background: rgba(0, 123, 255, 0.1);
+    border-radius: 8px;
+    border: 2px dashed rgba(0, 123, 255, 0.5);
 }

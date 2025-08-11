@@ -11,6 +11,10 @@ const API_BASE_URL = 'http://localhost:8000/api';
 let authToken = localStorage.getItem('access_token');
 let currentUser = JSON.parse(localStorage.getItem('user_data') || '{}');
 
+// Speech synthesis tracking
+let currentSpeechButton = null;
+let isSpeaking = false;
+
 /**
  * Generic API call helper function
  * @param {string} endpoint - API endpoint path
@@ -115,28 +119,79 @@ function showError(errorElement, loadingElement, message) {
 }
 
 /**
- * Text-to-speech functionality
+ * Text-to-speech functionality with play/stop control
  * @param {string} text - Text to read aloud
+ * @param {HTMLElement} button - The button that triggered this action
  */
-function readAloud(text) {
+function readAloud(text, button) {
     if (!text) return;
+    
+    // Check if Web Speech API is supported
+    if (!('speechSynthesis' in window)) {
+        alert('Text-to-speech is not supported in your browser.');
+        return;
+    }
+    
+    // If currently speaking, stop the speech
+    if (isSpeaking) {
+        stopSpeech();
+        return;
+    }
     
     console.log('Reading aloud:', text);
     
-    // Use Web Speech API for text-to-speech
-    if ('speechSynthesis' in window) {
-        // Stop any ongoing speech
+    // Stop any ongoing speech
+    speechSynthesis.cancel();
+    
+    // Set current button and speaking state
+    currentSpeechButton = button;
+    isSpeaking = true;
+    
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 0.8;
+    utterance.pitch = 1;
+    utterance.volume = 0.8;
+    
+    // Handle speech events
+    utterance.onstart = () => {
+        if (currentSpeechButton) {
+            currentSpeechButton.textContent = '⏹️ Stop';
+            currentSpeechButton.disabled = false;
+        }
+    };
+    
+    utterance.onend = () => {
+        resetSpeechButton();
+    };
+    
+    utterance.onerror = (event) => {
+        console.error('Speech synthesis error:', event.error);
+        resetSpeechButton();
+    };
+    
+    speechSynthesis.speak(utterance);
+}
+
+/**
+ * Stop current speech synthesis
+ */
+function stopSpeech() {
+    if (speechSynthesis.speaking) {
         speechSynthesis.cancel();
-        
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = 0.8;
-        utterance.pitch = 1;
-        utterance.volume = 0.8;
-        
-        speechSynthesis.speak(utterance);
-    } else {
-        alert('Text-to-speech is not supported in your browser.');
     }
+    resetSpeechButton();
+}
+
+/**
+ * Reset speech button to default state
+ */
+function resetSpeechButton() {
+    if (currentSpeechButton) {
+        currentSpeechButton.textContent = '🔊 Read';
+        currentSpeechButton.disabled = false;
+    }
+    currentSpeechButton = null;
+    isSpeaking = false;
 }
 
 /**
