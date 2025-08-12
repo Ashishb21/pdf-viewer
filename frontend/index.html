@@ -30,6 +30,12 @@
         </div>
         
         <div class="toolbar">
+            <button id="toggle-thumbnails-btn" disabled title="Toggle thumbnails">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3 5h4v4H3V5zm6 0h4v4H9V5zm6 0h4v4h-4V5zM3 11h4v4H3v-4zm6 0h4v4H9v-4zm6 0h4v4h-4v-4zM3 17h4v4H3v-4zm6 0h4v4H9v-4zm6 0h4v4h-4v-4z"/>
+                </svg>
+            </button>
+            
             <label for="file-input" class="file-label">Choose PDF File</label>
             <input type="file" id="file-input" accept=".pdf">
             
@@ -71,6 +77,12 @@
             <button id="ask-ai-btn" disabled>🤖 Ask AI</button>
             <button id="debug-text-btn" disabled style="background: #e74c3c;">🔍 Debug Text</button>
             
+            <button id="fullscreen-btn" disabled title="Toggle fullscreen">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+                </svg>
+            </button>
+            
             <div class="page-info">
                 <span>Page:</span>
                 <input type="number" id="page-input" class="page-input" min="1" value="1">
@@ -79,6 +91,16 @@
         </div>
         
         <div class="main-content">
+            <!-- Thumbnail Sidebar -->
+            <div class="thumbnail-sidebar" id="thumbnail-sidebar" style="display: none;">
+                <div class="thumbnail-header">
+                    <h4>Pages</h4>
+                </div>
+                <div class="thumbnail-container" id="thumbnail-container">
+                    <!-- Thumbnails will be generated here -->
+                </div>
+            </div>
+            
             <div class="pdf-panel">
                 <div class="viewer-container" id="viewer">
                     <div class="drop-zone" id="drop-zone">

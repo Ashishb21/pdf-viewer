@@ -14,6 +14,8 @@ class PDFViewer {
         this.lastSelectedText = null;
         this.searchMatches = [];
         this.currentSearchIndex = -1;
+        this.thumbnailsVisible = false;
+        this.isFullscreen = false;
         
         try {
             this.initializeElements();
@@ -58,6 +60,10 @@ class PDFViewer {
         this.searchPrev = document.getElementById('search-prev');
         this.searchNext = document.getElementById('search-next');
         this.searchResults = document.getElementById('search-results');
+        this.toggleThumbnailsBtn = document.getElementById('toggle-thumbnails-btn');
+        this.fullscreenBtn = document.getElementById('fullscreen-btn');
+        this.thumbnailSidebar = document.getElementById('thumbnail-sidebar');
+        this.thumbnailContainer = document.getElementById('thumbnail-container');
         
         // Validate critical elements
         if (!this.fileInput) {
@@ -104,6 +110,10 @@ class PDFViewer {
         if (this.debugTextBtn) this.debugTextBtn.addEventListener('click', () => this.toggleDebugText());
         if (this.pageInput) this.pageInput.addEventListener('change', (e) => this.goToPage(parseInt(e.target.value)));
         
+        // New feature buttons
+        if (this.toggleThumbnailsBtn) this.toggleThumbnailsBtn.addEventListener('click', () => this.toggleThumbnails());
+        if (this.fullscreenBtn) this.fullscreenBtn.addEventListener('click', () => this.toggleFullscreen());
+        
         // Drag and drop events
         if (this.dropZone) {
             this.dropZone.addEventListener('click', () => this.fileInput?.click());
@@ -142,6 +152,12 @@ class PDFViewer {
         
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => this.handleKeydown(e));
+        
+        // Fullscreen change events
+        document.addEventListener('fullscreenchange', () => this.handleFullscreenChange());
+        document.addEventListener('webkitfullscreenchange', () => this.handleFullscreenChange());
+        document.addEventListener('mozfullscreenchange', () => this.handleFullscreenChange());
+        document.addEventListener('MSFullscreenChange', () => this.handleFullscreenChange());
         
         // Search functionality
         if (this.searchInput) {
@@ -225,6 +241,8 @@ class PDFViewer {
         this.selectAllBtn.disabled = false;
         this.askAiBtn.disabled = false;
         this.debugTextBtn.disabled = false;
+        this.toggleThumbnailsBtn.disabled = false;
+        this.fullscreenBtn.disabled = false;
     }
     
     /**
@@ -788,6 +806,11 @@ class PDFViewer {
         this.currentPage = pageNum;
         this.updateNavigationButtons();
         this.scrollToPage(this.currentPage);
+        
+        // Update active thumbnail if thumbnails are visible
+        if (this.thumbnailsVisible) {
+            this.updateActiveThumbnail(this.currentPage);
+        }
     }
     
     scrollToPage(pageNum) {
@@ -942,6 +965,168 @@ class PDFViewer {
         } finally {
             this.askAiBtn.disabled = false;
             this.askAiBtn.textContent = '🤖 Ask AI';
+        }
+    }
+    
+    /**
+     * Toggle thumbnail sidebar visibility
+     */
+    toggleThumbnails() {
+        if (!this.pdfDoc) return;
+        
+        this.thumbnailsVisible = !this.thumbnailsVisible;
+        
+        if (this.thumbnailsVisible) {
+            this.thumbnailSidebar.style.display = 'flex';
+            this.toggleThumbnailsBtn.classList.add('active');
+            this.generateThumbnails();
+        } else {
+            this.thumbnailSidebar.style.display = 'none';
+            this.toggleThumbnailsBtn.classList.remove('active');
+        }
+    }
+    
+    /**
+     * Generate thumbnails for all pages
+     */
+    async generateThumbnails() {
+        if (!this.pdfDoc || !this.thumbnailContainer) return;
+        
+        // Clear existing thumbnails
+        this.thumbnailContainer.innerHTML = '';
+        
+        for (let pageNum = 1; pageNum <= this.pdfDoc.numPages; pageNum++) {
+            try {
+                const page = await this.pdfDoc.getPage(pageNum);
+                const viewport = page.getViewport({ scale: 0.2 });
+                
+                // Create thumbnail container
+                const thumbnailItem = document.createElement('div');
+                thumbnailItem.className = 'thumbnail-item';
+                if (pageNum === this.currentPage) {
+                    thumbnailItem.classList.add('active');
+                }
+                
+                // Create canvas for thumbnail
+                const canvas = document.createElement('canvas');
+                canvas.className = 'thumbnail-canvas';
+                const context = canvas.getContext('2d');
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                
+                // Add page number
+                const pageNumber = document.createElement('div');
+                pageNumber.className = 'thumbnail-page-number';
+                pageNumber.textContent = pageNum;
+                
+                thumbnailItem.appendChild(canvas);
+                thumbnailItem.appendChild(pageNumber);
+                
+                // Add click handler
+                thumbnailItem.addEventListener('click', () => {
+                    this.goToPage(pageNum);
+                    this.updateActiveThumbnail(pageNum);
+                });
+                
+                this.thumbnailContainer.appendChild(thumbnailItem);
+                
+                // Render thumbnail
+                const renderContext = {
+                    canvasContext: context,
+                    viewport: viewport
+                };
+                
+                await page.render(renderContext).promise;
+            } catch (error) {
+                console.error(`Error generating thumbnail for page ${pageNum}:`, error);
+            }
+        }
+    }
+    
+    /**
+     * Update active thumbnail when page changes
+     */
+    updateActiveThumbnail(pageNum) {
+        const thumbnails = this.thumbnailContainer.querySelectorAll('.thumbnail-item');
+        thumbnails.forEach((thumbnail, index) => {
+            if (index + 1 === pageNum) {
+                thumbnail.classList.add('active');
+            } else {
+                thumbnail.classList.remove('active');
+            }
+        });
+    }
+    
+    /**
+     * Toggle fullscreen mode
+     */
+    async toggleFullscreen() {
+        if (!document.fullscreenElement && !document.webkitFullscreenElement && 
+            !document.mozFullScreenElement && !document.msFullscreenElement) {
+            // Enter fullscreen
+            await this.enterFullscreen();
+        } else {
+            // Exit fullscreen
+            await this.exitFullscreen();
+        }
+    }
+    
+    /**
+     * Enter fullscreen mode
+     */
+    async enterFullscreen() {
+        try {
+            const container = document.querySelector('.container');
+            if (container.requestFullscreen) {
+                await container.requestFullscreen();
+            } else if (container.webkitRequestFullscreen) {
+                await container.webkitRequestFullscreen();
+            } else if (container.mozRequestFullScreen) {
+                await container.mozRequestFullScreen();
+            } else if (container.msRequestFullscreen) {
+                await container.msRequestFullscreen();
+            }
+        } catch (error) {
+            console.error('Error entering fullscreen:', error);
+        }
+    }
+    
+    /**
+     * Exit fullscreen mode
+     */
+    async exitFullscreen() {
+        try {
+            if (document.exitFullscreen) {
+                await document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                await document.webkitExitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                await document.mozCancelFullScreen();
+            } else if (document.msExitFullscreen) {
+                await document.msExitFullscreen();
+            }
+        } catch (error) {
+            console.error('Error exiting fullscreen:', error);
+        }
+    }
+    
+    /**
+     * Handle fullscreen state changes
+     */
+    handleFullscreenChange() {
+        const isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement || 
+                               document.mozFullScreenElement || document.msFullscreenElement);
+        
+        this.isFullscreen = isFullscreen;
+        
+        if (isFullscreen) {
+            document.body.classList.add('fullscreen-mode');
+            this.fullscreenBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>';
+            this.fullscreenBtn.title = 'Exit fullscreen';
+        } else {
+            document.body.classList.remove('fullscreen-mode');
+            this.fullscreenBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>';
+            this.fullscreenBtn.title = 'Toggle fullscreen';
         }
     }
 }
